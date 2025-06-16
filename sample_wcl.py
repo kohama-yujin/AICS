@@ -1,15 +1,16 @@
 import numpy as np
 
 
-# テキスト内のWCLを実装
+# 授業資料内のWCLを実装
 class SampleWCL:
     def __init__(self, ap, rssi):
         self.ap = ap
         self.rssi = rssi
 
-    def calculate_coordinate(self, floor, p, l):
+    def get_weight_and_coords(self, floor, p, l):
         """
-        座標の計算を行うメソッド
+        授業資料内のWCLに従い、重みと座標を返すメソッド
+        ※未完成（計算が合わない）
 
         args:
             floor: 階数
@@ -17,7 +18,8 @@ class SampleWCL:
             l: アンカーノードの個数 L
 
         return:
-            T: 推定位置座標 T
+            weight: 重み
+            coorinate: 座標 (x, y)
         """
 
         # 指定階数で計測したデータを抽出
@@ -68,9 +70,4 @@ class SampleWCL:
             )
         print(f"座標\n{coordinate}\n")  # デバッグ用
 
-        # 6. 座標の計算
-        x = sum(w * coord[0] for w, coord in zip(weight, coordinate)) / sum(weight)
-        y = sum(w * coord[1] for w, coord in zip(weight, coordinate)) / sum(weight)
-        T = (x, y)
-
-        return T
+        return weight, coordinate
