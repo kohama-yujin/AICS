@@ -1,6 +1,7 @@
 from aics_excel_loader import AicsExcelLoader
 from sample_wcl import SampleWCL
 from wcl import WCL
+from overlap_ap import Overlapap
 
 
 def main():
@@ -23,8 +24,14 @@ def main():
     # print(location.data["3"]["x"])
 
     # 授業資料中のWCLを実装
+    '''
     sampleWcl = SampleWCL(ap.data, rssi.data)
-    weight, coordinate = sampleWcl.get_weight_and_coords(3, 2, 3)
+    weight, coordinate = sampleWcl.get_weight_and_coords(3, 1, 3)
+
+    '''
+    # アクセスポイントの被りなし
+    overlapWcl = Overlapap(ap.data, rssi.data)
+    weight, coordinate = overlapWcl.get_weight_and_coords(3, 1, 3)
 
     # 推定位置座標 T を計算
     wcl = WCL(weight, coordinate)
