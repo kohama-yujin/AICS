@@ -53,11 +53,18 @@ class SampleWCL:
         以下、授業資料より抜粋
         重みは、上位三つの中でRSSIの中央値が最小のもの、つまり大きさ3番目の値との差[dB]を求め、その真値とする。
         """
-        # 4. 重みを計算
+        # 4. 重みを計算(相対的な重み)
         weight = []
+        min_rssi = float(rssi_med["MED (dBm)"].min())  # 最小の中央値を取得
         for rssi in rssi_med["MED (dBm)"]:
-            weight.append(float(rssi - rssi_med["MED (dBm)"].min()))
+            rssi = float(rssi) 
+            if rssi == min_rssi:
+                weight.append(1.0)  # 最小の中央値の重みを1に設定
+            else:
+                weight.append(float(10 ** ((rssi - min_rssi) / 10)))   # 最小中央値との差を基に計算
         print(f"重み\n{weight}\n")  # デバッグ用
+
+
 
         # 5. 座標を取得
         coordinate = []

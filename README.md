@@ -11,6 +11,10 @@
     cd AICS
     pip install -r requirements.txt
     ```
+
+    ```
+    pip install openpyxl
+　　```
 ## sample_wcl
 授業資料中のWCLに関する記述に従い、重みと座標を返すサンプルですが、まだ計算が合わないです。
 メソッド作成時は参考にしてください。

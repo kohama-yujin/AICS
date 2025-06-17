@@ -24,7 +24,7 @@ def main():
 
     # 授業資料中のWCLを実装
     sampleWcl = SampleWCL(ap.data, rssi.data)
-    weight, coordinate = sampleWcl.get_weight_and_coords(3, 1, 3)
+    weight, coordinate = sampleWcl.get_weight_and_coords(3, 2, 3)
 
     # 推定位置座標 T を計算
     wcl = WCL(weight, coordinate)
