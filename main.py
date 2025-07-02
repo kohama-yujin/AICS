@@ -24,6 +24,7 @@ def main():
     # print(location.data["3"].columns)  # .columnsでカラム名を確認できる
     # print(location.data["3"]["x"])
 
+    
     # 授業資料中のWCLを実装（位置P=1から59まで）
     sampleWcl = SampleWCL(ap.data, rssi.data)
     
@@ -39,7 +40,7 @@ def main():
     
     for p in range(1, 60):  # 位置P=1から59まで
         try:
-            weight, coordinate = sampleWcl.get_weight_and_coords(3, p, 3)
+            weight, coordinate = sampleWcl.get_weight_and_coords(4, p, 5)
             
             # 推定位置座標 T を計算
             wcl = WCL(weight, coordinate)
@@ -78,42 +79,56 @@ def main():
             writer.writerow([position, x_coord, y_coord])
     
     print(f"\n結果をCSVファイル '{csv_filename}' に保存しました")
-    
-    
-
+     
     '''
     # アクセスポイントの被りなし（位置P=1から59まで）
     overlapWcl = Overlapap(ap.data, rssi.data)
     
     # 結果を格納するリスト
-    results = []
+    overlap_results = []
     
     for p in range(1, 60):  # 位置P=1から59まで
         try:
-            weight, coordinate = overlapWcl.get_weight_and_coords(3, p, 3)
+            weight, coordinate = overlapWcl.get_weight_and_coords(4, p, 3)
             
             # 推定位置座標 T を計算
             wcl = WCL(weight, coordinate)
             T = wcl.calculate_coordinate()
             
-            results.append({
+            overlap_results.append({
                 'position': p,
                 'estimated_coordinate': T,
                 'weights': weight,
                 'anchor_coordinates': coordinate
             })
             
-            print(f"位置P={p}: 推定位置座標 T = {T}")
-            
         except Exception as e:
-            print(f"位置P={p}: エラーが発生しました - {e}")
+            print(f"Overlapap 位置P={p}: エラーが発生しました - {e}")
             continue
     
-    print(f"\n処理完了: {len(results)}個の位置で推定が成功しました")
-    '''
-
+    print(f"\nOverlapap処理完了: {len(overlap_results)}個の位置で推定が成功しました")
     
-
+    # 推定座標をまとめて出力
+    print("\n=== Overlapap推定位置座標一覧 ===")
+    for result in overlap_results:
+        print(f"位置P={result['position']}: {result['estimated_coordinate']}")
+    
+    # CSVファイルに結果を出力
+    overlap_csv_filename = "overlap_estimation_results.csv"
+    with open(overlap_csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        # ヘッダーを書き込み
+        writer.writerow(['Position', 'X_Coordinate', 'Y_Coordinate'])
+        
+        # データを書き込み
+        for result in overlap_results:
+            position = result['position']
+            x_coord = result['estimated_coordinate'][0]
+            y_coord = result['estimated_coordinate'][1]
+            writer.writerow([position, x_coord, y_coord])
+    
+    print(f"\nOverlapap結果をCSVファイル '{overlap_csv_filename}' に保存しました")
+    '''
 
 if __name__ == "__main__":
     main()

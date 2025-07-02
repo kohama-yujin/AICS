@@ -25,7 +25,7 @@ class Overlapap:
         """
 
         # 指定階数で計測したデータを抽出
-        self.rssi = self.rssi[str(floor)]
+        rssi_floor_data = self.rssi[str(floor)]
 
         """
         以下、授業資料より抜粋
@@ -33,7 +33,7 @@ class Overlapap:
         """
         # 1. 指定階数のAPを抽出
         check_str = str(floor) + "F"
-        rssi_floor_only = self.rssi[self.rssi["AP_name"].str.contains(check_str)]
+        rssi_floor_only = rssi_floor_data[rssi_floor_data["AP_name"].str.contains(check_str)]
         print(f"{floor}階のAP\n{rssi_floor_only}\n")  # デバッグ用
 
         # 2. 位置PのRSSIデータを抽出
