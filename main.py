@@ -1,5 +1,5 @@
 from aics_excel_loader import AicsExcelLoader
-from sample_wcl import SampleWCL
+from count import Count
 from wcl import WCL
 
 
@@ -23,8 +23,8 @@ def main():
     # print(location.data["3"]["x"])
 
     # 授業資料中のWCLを実装
-    sampleWcl = SampleWCL(ap.data, rssi.data)
-    weight, coordinate = sampleWcl.get_weight_and_coords(3, 2, 3)
+    sampleWcl = Count(ap.data, rssi.data)
+    weight, coordinate = sampleWcl.get_weight_and_coords(3, 1, 3)
 
     # 推定位置座標 T を計算
     wcl = WCL(weight, coordinate)
