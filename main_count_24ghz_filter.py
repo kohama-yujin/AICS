@@ -1,34 +1,36 @@
 from aics_excel_loader import AicsExcelLoader
 from wcl import WCL
 import csv
-from integrated_filter import IntegratedFilter
+
+from count_24ghz_filter import Count24GHzFilter
 
 
 def main():
+    # パスを確認・修正
     data_folda = "./AICS/dataset" 
-
+    
     # インスタンス化
     ap = AicsExcelLoader(data_folda + "/AP_coordinate.xlsx")
     location = AicsExcelLoader(data_folda + "/location_coordinate.xlsx")
     rssi = AicsExcelLoader(data_folda + "/measured_RSSI.xlsx")
 
-    print("=== 統合フィルタ実行 ===")
-    print("適用フィルタ: 2.4GHz + カウント優先 + 重複除外")
+    print("=== カウント + 2.4GHzフィルタ実行 ===")
+    print("適用フィルタ: 2.4GHz + カウント優先（重複許可）")
     
-    # 統合フィルタのインスタンス化
-    integrated_filter = IntegratedFilter(ap.data, rssi.data)
+    # カウント + 2.4GHzフィルタのインスタンス化
+    count_24ghz_filter = Count24GHzFilter(ap.data, rssi.data)
     
     # 結果を格納するリスト
     results = []
     
     for p in range(1, 60):  # 位置P=1から59まで
         try:
-            weight, coordinate = integrated_filter.get_weight_and_coords(4, p, 3)
-            print(f"統合フィルタ結果 位置P={p}の重み: {weight}, 座標: {coordinate}")
+            weight, coordinate = count_24ghz_filter.get_weight_and_coords(3, p, 3)
+            print(f"カウント + 2.4GHzフィルタ結果 位置P={p}の重み: {weight}, 座標: {coordinate}")
             
             # 重みや座標が空でないかチェック
             if not weight or not coordinate:
-                print(f"位置P={p}: アクセスポイントが見つかりませんでした（統合フィルタ後）")
+                print(f"位置P={p}: アクセスポイントが見つかりませんでした（カウント + 2.4GHzフィルタ後）")
                 continue
             
             # 推定位置座標 T を計算
@@ -43,18 +45,18 @@ def main():
             })
             
         except Exception as e:
-            print(f"統合フィルタ 位置P={p}: エラーが発生しました - {e}")
+            print(f"カウント + 2.4GHzフィルタ 位置P={p}: エラーが発生しました - {e}")
             continue
     
-    print(f"\n統合フィルタ処理完了: {len(results)}個の位置で推定が成功しました")
+    print(f"\nカウント + 2.4GHzフィルタ処理完了: {len(results)}個の位置で推定が成功しました")
     
     # 推定座標をまとめて出力
-    print("\n=== 統合フィルタ推定位置座標一覧 ===")
+    print("\n=== カウント + 2.4GHzフィルタ推定位置座標一覧 ===")
     for result in results:
         print(f"位置P={result['position']}: {result['estimated_coordinate']}")
     
     # CSVファイルに結果を出力
-    csv_filename = "estimation_results_integrated_filter.csv"
+    csv_filename = "estimation_results_count_24ghz_filter.csv"
     with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         # ヘッダーを書き込み
