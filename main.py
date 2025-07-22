@@ -40,7 +40,7 @@ def main():
     
     for p in range(1, 60):  # 位置P=1から59まで
         try:
-            weight, coordinate = sampleWcl.get_weight_and_coords(4, p, 5)
+            weight, coordinate = sampleWcl.get_weight_and_coords(3, p, 3)
             
             # 推定位置座標 T を計算
             wcl = WCL(weight, coordinate)
@@ -89,7 +89,7 @@ def main():
     
     for p in range(1, 60):  # 位置P=1から59まで
         try:
-            weight, coordinate = overlapWcl.get_weight_and_coords(4, p, 3)
+            weight, coordinate = overlapWcl.get_weight_and_coords(3, p, 3)
             
             # 推定位置座標 T を計算
             wcl = WCL(weight, coordinate)
