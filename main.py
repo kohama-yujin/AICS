@@ -23,8 +23,8 @@ def main():
     # print(location.data["3"]["x"])
 
     # 授業資料中のWCLを実装
-    sampleWcl = Count(ap.data, rssi.data)
-    weight, coordinate = sampleWcl.get_weight_and_coords(3, 1, 3)
+    sampleCount = Count(ap.data, rssi.data)
+    weight, coordinate = sampleCount.get_weight_and_coords(4, 59, 3)
 
     # 推定位置座標 T を計算
     wcl = WCL(weight, coordinate)
