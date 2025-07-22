@@ -1,0 +1,637 @@
+From ba61ebb3892185994bf0722307e2601d0c8d40dc Mon Sep 17 00:00:00 2001
+From: misaishikawa33 <ishikawa.misa.dj@tut.jp>
+Date: Sun, 29 Jun 2025 15:28:39 +0900
+Subject: [PATCH] =?UTF-8?q?p=E3=82=921=E3=81=8B=E3=82=8959=E3=81=BE?=
+ =?UTF-8?q?=E3=81=A7=E5=AE=9F=E8=A1=8C=E3=81=A8=E4=BF=9D=E5=AD=98?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ README.md                                     |  67 +++---
+ __pycache__/aics_excel_loader.cpython-310.pyc | Bin 644 -> 643 bytes
+ __pycache__/four_anchors.cpython-310.pyc      | Bin 0 -> 1751 bytes
+ __pycache__/overlap_ap.cpython-310.pyc        | Bin 1967 -> 1966 bytes
+ __pycache__/sample_wcl.cpython-310.pyc        | Bin 1756 -> 1766 bytes
+ __pycache__/wcl.cpython-310.pyc               | Bin 948 -> 947 bytes
+ estimation_results.csv                        |  60 ++++++
+ main.py                                       | 163 +++++++++++----
+ overlap_ap.py                                 | 190 +++++++++---------
+ sample_wcl.py                                 |   6 +-
+ 10 files changed, 320 insertions(+), 166 deletions(-)
+ create mode 100644 __pycache__/four_anchors.cpython-310.pyc
+ create mode 100644 estimation_results.csv
+
+diff --git a/README.md b/README.md
+index df7a0b6..491f0a1 100644
+--- a/README.md
++++ b/README.md
+@@ -1,24 +1,43 @@
+-# AICS(Advanced Information and Communication Systems)
+-情報通信システム特論Ⅰのリポジトリです。
+-
+-## インストール
+-1. このリポジトリをクローンします。
+-    ```bash
+-    git clone https://github.com/kohama-yujin/AICS.git
+-    ```
+-2. 必要なライブラリをインストールします。
+-    ```bash
+-    cd AICS
+-    pip install -r requirements.txt
+-    ```
+-
+-    ```
+-    pip install openpyxl
+-　　```
+-## sample_wcl
+-授業資料中のWCLに関する記述に従い、重みと座標を返すサンプルですが、まだ計算が合わないです。
+-メソッド作成時は参考にしてください。
+-
+-## 参考文献
+-- [【Python】Pandasの基本的な使い方のまとめ](https://qiita.com/k-keita/items/953bd334d4da8b944a0b)
+-- [Pandas DataFrameを徹底解説！](https://ai-inter1.com/pandas-dataframe_basic/)
++# AICS(Advanced Information and Communication Systems)
++情報通信システム特論Ⅰのリポジトリです。
++
++## インストール
++1. このリポジトリをクローンします。
++    ```bash
++    git clone https://github.com/kohama-yujin/AICS.git
++    ```
++2. 必要なライブラリをインストールします。
++    ```bash
++    cd AICS
++    pip install -r requirements.txt
++    ```
++
++    ```
++    pip install openpyxl
++　　```
++## sample_wcl
++授業資料中のWCLに関する記述に従い、重みと座標を返すサンプルです。
++メソッド作成時は参考にしてください。
++
++## overlap_ap.py
++同じアクセスポイントが上位にランクインした場合，重複したアクセスポイントは除く
++
++
++
++
++
++## 参考文献
++- [【Python】Pandasの基本的な使い方のまとめ](https://qiita.com/k-keita/items/953bd334d4da8b944a0b)
++- [Pandas DataFrameを徹底解説！](https://ai-inter1.com/pandas-dataframe_basic/)
++
++
++##  wcl.py
++### x座標の計算:
++- x = Σ(重み[i] × 座標[i][0]) / Σ(重み[i])
++### y座標の計算:
++- y = Σ(重み[i] × 座標[i][1]) / Σ(重み[i])
++
++### 処理の流れ
++- 各基準点の重みと座標を受け取る
++- 重み付き平均により、x座標とy座標をそれぞれ計算
++- 計算された座標をタプル (x, y) として返す
+diff --git a/__pycache__/aics_excel_loader.cpython-310.pyc b/__pycache__/aics_excel_loader.cpython-310.pyc
+index a9fc2eb8bf1b86fed8eeb5eaa622150498411d13..cfc4438930e36b7c73065a92b7f32b11928a13b7 100644
+GIT binary patch
+delta 45
+zcmZo+ZD!@p=jG*M0D|QW@f*2I8AVL>GxBp&^>Z_e6ZJETGcvOi%M&M0Wqc0+2F(rn
+
+delta 46
+zcmZo>ZDHlk=jG*M00PDH0UNnX8AZ+XGxBp&^>Z_e6ZJDQb8`}t^nDE{Phory00*`W
+Ae*gdg
+
+diff --git a/__pycache__/four_anchors.cpython-310.pyc b/__pycache__/four_anchors.cpython-310.pyc
+new file mode 100644
+index 0000000000000000000000000000000000000000..ab12f2ccc813d92fe54033d8388382186bc48afa
+GIT binary patch
+literal 1751
+zcmZuxTW=dh6rP#Acz5ljrsa~9R@xUtEun^I3qeClQKb+C@_-bnS}mT9vx&Xy?u91N
+zSc>hGB+!J4tHMP}5Qx&M5mH|eB;-HvIFD@YCQs#=2jI*)SJYX}*_m_u&Y3fF{GJ{I
+z!8rSeHQAd(C=r|ELxRmEnBiF<6j5A3<M>TP36&NQm0Dz+P&|eT@*c?1NJ-G+gTUqz
+z%<vo#2W%-47L+WYafwP)hQCY|@SyU{gdYd*4h@$C=)n+c;baJAm<PfzLl$BLC^!Q{
+zJW?Q>*flN(VdxelE{9HKA`pgw4CE&isPOyy<$+1R>I_uf&>nEZNq5@5VGl%c3`=id
+z@aoXmfWWtGuQcfg;l<i4*DTBR+{m&rU>^!!DmL(3em~BO2jY?t9gJRBXfV@&=P(3}
+zrci_#ZsC4dTS(vEQT!aL%R(w9CH-g$uM;M3fL>jRB!<6+6J`of`CGY#F=7f+r~+Qd
+zG-%h=NTMoJQ@JGMI%4XSOfyuY`U<IMScV!*x+!!u(9JRlbaPBgEtIZB8P)YjVH(Z!
+zqjhxywQ$|&?k=Ni=j&OJWr3GvS!PU=pvv_14DHzfwCmTzI#Ot_ko6(j`#d@W_FWm^
+zonrb?Y=8sEB1`c5V!emuge_#Qi7EK3M`T6wa1J^(`oYr^<xd^SCrFC53|OaG?g)$N
+zEH^>mYMhDRh5{Jo{^+bOb$+<N`(Uy2#ajD=n@M96Zd=m0*Z%#}q_L39H})1+lEzNb
+zxYPdi$IhL#r1{D2&SyzuEop5e&F!SsN?OZ@-u|5bt@F*@_U5h5((T7vOS^ZL9&LV^
+zG;XzTFD1>7lg3@}`FLyDI5e<>a#%dviI^rTz8@6Ly{}d~pZ|P9QY)Ine#wqp-!om0
+zIy2_z33;VxCe81X)`O&ZFKKNht<{t+Lr(4akHDKbd;}agQ5<+Dp>H^Dc`^d*H02Y%
+zOAwUn*^yH;yXRnDn0d*ZEgULwe1&HQM=j5;I<XFS9TEWG!BK-_V=n*yz~eqpdAPmu
+zXnS)M)ZQ5zyPC8XMZC=&V@`kTjmzc*`g*l+MZDwpX1Q*MCC8(#R}P?hC>F2x;V&P8
+zhgdu=$Zy|Ed;WW)3>+ALy|yPBSu9@aeo7qAa6FrGx@i~%BW(y=3ZsB)CEtr|*9*B)
+zgLEUF4gDap-nT2U13V~=9dW7ZdR(<@HHateC|q_ceyPwKC;*gd`2oi@jw@U*O**A%
+zOZYw|I+2xD*Ydr}ELT%Tjc3!p0CFhT(oGdsYPT9(12{`?yKx$#5^xSs3a+Qh;>6Q#
+z)+Hia{!H14tgZuSUerpB!YqiwB9MHZket$opT>D9j|u5jbL3h0%Ss;Sum)capCfrJ
+zD>*D<lbD$NqyC#$H8OYppwT@MVWgml4k<#iEN)m<)u(YqtaFxiJ+>=dNg$eG@PZ(s
+zkjIFKJ`lZK@Iyf~1kuPT5Bj*`#Z~CS#H*#8W0t9-G<ofnF6yh|rlc)e!>8r{05fgz
+AIRF3v
+
+literal 0
+HcmV?d00001
+
+diff --git a/__pycache__/overlap_ap.cpython-310.pyc b/__pycache__/overlap_ap.cpython-310.pyc
+index 9e249acd22c99689d65569c1bc1580ff48cff47d..c541c838da1168932d0cca27d83182b1465b0fcc 100644
+GIT binary patch
+delta 47
+zcmZ3_zmA_bpO=@50SGi2<1=a|^1c+&)6dAyP1VoMEKbzVEY8TxPApH{%+0uj4FEcC
+B4r>4a
+
+delta 48
+zcmZ3-zn-5rpO=@50SIni49F0l$oo=MUq2&1H&s73vp7*dGcz|QF-hOoa5ER<5;g!@
+CX%58z
+
+diff --git a/__pycache__/sample_wcl.cpython-310.pyc b/__pycache__/sample_wcl.cpython-310.pyc
+index 4b0a20b6cf6cdbea19c956d34dd63651b524b11b..4b04cc050430befa4032212e055e414fe2659e93 100644
+GIT binary patch
+delta 454
+zcmYLFO-sW-5S`s*^VMu3TB$+Ai|EZB{Q-LR;!V&RShY!8qDjEZgd#<69!f5P2<=Z0
+z|A9Xv)Pomqp1nG0g)Yo8Gw;25!_4Hjl!=rM(EFWTbU()OtGVCqCWFiNAj-maly#$C
+zco&u$I~n@KvM3HIvYY`R#E>&&BNjlR+yA*@Ehq%)s4E^o%qASgv}PE&hU^8Dh6erm
+zt3F~3&_F|p0Fd{HU6{G13^eDsR^v9H8SBba)==3`ys*$x4r&iI*(P!WH6puc&n03Z
+zxrV~Y1=`9CU}8*R#EQnEI)byU!X?b5o{KIvdOVHMnV3pW$?o>F&U2x>8ruNnZNeJq
+z2|FN=41IK#+mVr^!L$qw-YYzmwV3W=)lv7+E604BdF2~#tv`}}73ETo4$AjWe$IFN
+uRM1%~an(<fv|=|E>sNl7Wl?9|>8LOd%VY6udMli}qFMfkd$wC9#^4Wm2yV3i
+
+delta 462
+zcmYLF%}T>S5T4y+lWdZW)gm^CcoI(%d;m{+6$CF{s#Mn6zYwjtC=-el4+<V67eR#f
+z8GHwQ0}sWE7hl1vv#rpDZ<(3zn{RgZM|~-kDdhv5_m6|t;7NTiCrK+y&yuu#)kxay
+zwAVOI_P0yU4hIp*Ji;#F>V^RzbRcKQhAgJ|1mu6F*$Nc4VGT5op~FTT?J?;Jkz2@K
+zKwBv2wqNZbV}JsM7UaUaq%NG?(hfRP-ZH!dbOs$;yV}$8kryty+DGfoh&>VqXpuNX
+zZ`vYeE$2|kT%f1j7)H(*hOF>s*&fu_ih#I)Y5@l5cX>ZWIdZic)40pJiF2VN!_`1X
+zt5Dq`gBeK!7f{Y$M}ugz*^`Vn3x%O+rrkXQQ%6-k@bxWaw$qFBA5!}<`8D~}@tz!)
+wFq}K0#PIEtAM<L|7xdi|(d=bef5I*%tXCe1XSY(}JQTI^SKP9V^4dxN0H^(GrvLx|
+
+diff --git a/__pycache__/wcl.cpython-310.pyc b/__pycache__/wcl.cpython-310.pyc
+index 2f9bb1183a7e8a15fec7465c0a3ccb7fa53c4af7..b65e47c370dfaf5d8e802d077a895ecec5e075f7 100644
+GIT binary patch
+delta 44
+ycmdnOzL}jnpO=@50SJ~i#82eDDWa~Qk)NBYpPN~nsGnJ!k(r%Xp1ASnZYBU4mk#0p
+
+delta 45
+zcmdnYzJ;ATpO=@50SKHn22A9>DXO8Lk)NBYpPN~nsGpgco0FKN?`yd6$8IJ79Ni9T
+
+diff --git a/estimation_results.csv b/estimation_results.csv
+new file mode 100644
+index 0000000..4c1ba71
+--- /dev/null
++++ b/estimation_results.csv
+@@ -0,0 +1,60 @@
++Position,X_Coordinate,Y_Coordinate
++1,30.10551672968022,0.06226023496247712
++2,29.288139417268994,0.0
++3,25.69357818663219,0.0
++4,27.876094153222652,0.0
++5,23.044834829133315,0.0
++6,20.489116271038206,0.0
++7,20.65894217951271,0.0
++8,17.573499374338077,0.0
++9,10.314709684025155,0.0
++10,9.202218427448399,0.0
++11,9.626753007230166,0.0
++12,9.169878864024438,0.0
++13,9.0663842707057,-0.03422692437237642
++14,9.078164730809064,-0.022232274085318207
++15,8.609265358303889,-2.0821021680067653
++16,3.196044356034397,-7.085826824538099
++17,3.1288702616271844,10.236222408639112
++18,1.6598997057571652,14.134897227336074
++19,-0.1633571462543193,14.11495078291674
++20,0.0,16.840513307065624
++21,0.0,16.02522814908647
++22,0.0,16.017137220000006
++23,0.0,15.740714379111452
++24,0.0,15.862936580734889
++25,0.0,15.716104886652644
++26,0.0,15.877682675466552
++27,0.0,28.703786647174812
++28,0.0,25.963844801993993
++29,0.0,30.76923470002984
++30,0.0,30.72320299277602
++31,0.0,30.912147067355534
++32,0.0,30.78225402856486
++33,0.0,30.726548839269483
++34,0.0,30.933505251669537
++35,0.0,40.22165338681891
++36,0.0,42.707179198699244
++37,0.0,43.997320489431424
++38,0.0,44.13473083635686
++39,0.0,44.13760836601334
++40,0.0,44.189452119943134
++41,0.19604074758442358,44.702887135107865
++42,2.1637970456625157,48.95115768950122
++43,3.5312304346543093,52.14172055418764
++44,4.461669669714469,55.64515263100668
++45,4.728496197588415,55.77471306413929
++46,5.083841665296614,56.00000000000001
++47,5.760353500035077,56.0
++48,6.048949041315782,56.0
++49,6.3526674982270785,56.0
++50,12.6168435254215,56.0
++51,13.7485887322094,56.0
++52,14.204661100006833,56.00000000000001
++53,20.674409235223795,55.99999999999999
++54,23.55577362790295,56.0
++55,25.40532298016451,56.000000000000014
++56,25.554119689923397,56.00000000000001
++57,25.65261423001114,56.00000000000001
++58,25.416114224254407,55.99999999999999
++59,25.55103503267449,56.0
+diff --git a/main.py b/main.py
+index 81c80ce..011f9ae 100644
+--- a/main.py
++++ b/main.py
+@@ -1,44 +1,119 @@
+-from aics_excel_loader import AicsExcelLoader
+-from sample_wcl import SampleWCL
+-from wcl import WCL
+-from overlap_ap import Overlapap
+-
+-
+-def main():
+-    data_folda = "./dataset"  # フォルダ名
+-
+-    # インスタンス化
+-    ap = AicsExcelLoader(data_folda + "/AP_coordinate.xlsx")
+-    location = AicsExcelLoader(data_folda + "/location_coordinate.xlsx")
+-    rssi = AicsExcelLoader(data_folda + "/measured_RSSI.xlsx")
+-
+-    # データの確認
+-    # print(ap.data)  # シートが1枚の時：データフレーム型
+-    # print(location.data["3"])  # シートが複数枚の時：辞書型（keyはシート名）
+-    # print(location.data["4"])  # 処理しやすいよう、シート名を階数に変更している
+-    # print(rssi.data["3"])  # key指定したdata["3"]等は、データフレーム型
+-    # print(rssi.data["4"])
+-
+-    # カラムの確認
+-    # print(location.data["3"].columns)  # .columnsでカラム名を確認できる
+-    # print(location.data["3"]["x"])
+-
+-    # 授業資料中のWCLを実装
+-    '''
+-    sampleWcl = SampleWCL(ap.data, rssi.data)
+-    weight, coordinate = sampleWcl.get_weight_and_coords(3, 1, 3)
+-
+-    '''
+-    # アクセスポイントの被りなし
+-    overlapWcl = Overlapap(ap.data, rssi.data)
+-    weight, coordinate = overlapWcl.get_weight_and_coords(3, 1, 3)
+-
+-    # 推定位置座標 T を計算
+-    wcl = WCL(weight, coordinate)
+-    T = wcl.calculate_coordinate()
+-
+-    print(f"推定位置座標 T: {T}")
+-
+-
+-if __name__ == "__main__":
+-    main()
++from aics_excel_loader import AicsExcelLoader
++from sample_wcl import SampleWCL
++from wcl import WCL
++from overlap_ap import Overlapap
++import csv
++
++
++def main():
++    data_folda = "./dataset"  # フォルダ名
++
++    # インスタンス化
++    ap = AicsExcelLoader(data_folda + "/AP_coordinate.xlsx")
++    location = AicsExcelLoader(data_folda + "/location_coordinate.xlsx")
++    rssi = AicsExcelLoader(data_folda + "/measured_RSSI.xlsx")
++
++    # データの確認
++    # print(ap.data)  # シートが1枚の時：データフレーム型
++    # print(location.data["3"])  # シートが複数枚の時：辞書型（keyはシート名）
++    # print(location.data["4"])  # 処理しやすいよう、シート名を階数に変更している
++    # print(rssi.data["3"])  # key指定したdata["3"]等は、データフレーム型
++    # print(rssi.data["4"])
++
++    # カラムの確認
++    # print(location.data["3"].columns)  # .columnsでカラム名を確認できる
++    # print(location.data["3"]["x"])
++
++    # 授業資料中のWCLを実装（位置P=1から59まで）
++    sampleWcl = SampleWCL(ap.data, rssi.data)
++    
++    # デバッグ: RSSIデータの構造を確認
++    print("RSSI data keys:", rssi.data.keys() if hasattr(rssi.data, 'keys') else type(rssi.data))
++    if hasattr(rssi.data, 'keys'):
++        print("RSSI data['3'] columns:", rssi.data['3'].columns.tolist())
++        print("RSSI data['3'] 位置Pの値:", rssi.data['3']['Location index P'].unique())
++
++    
++    # 結果を格納するリスト
++    sample_results = []
++    
++    for p in range(1, 60):  # 位置P=1から59まで
++        try:
++            weight, coordinate = sampleWcl.get_weight_and_coords(3, p, 3)
++            
++            # 推定位置座標 T を計算
++            wcl = WCL(weight, coordinate)
++            T = wcl.calculate_coordinate()
++            
++            sample_results.append({
++                'position': p,
++                'estimated_coordinate': T,
++                'weights': weight,
++                'anchor_coordinates': coordinate
++            })
++            
++        except Exception as e:
++            print(f"SampleWCL 位置P={p}: エラーが発生しました - {e}")
++            continue
++    
++    print(f"\nSampleWCL処理完了: {len(sample_results)}個の位置で推定が成功しました")
++    
++    # 推定座標をまとめて出力
++    print("\n=== 推定位置座標一覧 ===")
++    for result in sample_results:
++        print(f"位置P={result['position']}: {result['estimated_coordinate']}")
++    
++    # CSVファイルに結果を出力
++    csv_filename = "estimation_results.csv"
++    with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
++        writer = csv.writer(csvfile)
++        # ヘッダーを書き込み
++        writer.writerow(['Position', 'X_Coordinate', 'Y_Coordinate'])
++        
++        # データを書き込み
++        for result in sample_results:
++            position = result['position']
++            x_coord = result['estimated_coordinate'][0]
++            y_coord = result['estimated_coordinate'][1]
++            writer.writerow([position, x_coord, y_coord])
++    
++    print(f"\n結果をCSVファイル '{csv_filename}' に保存しました")
++    
++    
++
++    '''
++    # アクセスポイントの被りなし（位置P=1から59まで）
++    overlapWcl = Overlapap(ap.data, rssi.data)
++    
++    # 結果を格納するリスト
++    results = []
++    
++    for p in range(1, 60):  # 位置P=1から59まで
++        try:
++            weight, coordinate = overlapWcl.get_weight_and_coords(3, p, 3)
++            
++            # 推定位置座標 T を計算
++            wcl = WCL(weight, coordinate)
++            T = wcl.calculate_coordinate()
++            
++            results.append({
++                'position': p,
++                'estimated_coordinate': T,
++                'weights': weight,
++                'anchor_coordinates': coordinate
++            })
++            
++            print(f"位置P={p}: 推定位置座標 T = {T}")
++            
++        except Exception as e:
++            print(f"位置P={p}: エラーが発生しました - {e}")
++            continue
++    
++    print(f"\n処理完了: {len(results)}個の位置で推定が成功しました")
++    '''
++
++    
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/overlap_ap.py b/overlap_ap.py
+index 2557125..813b924 100644
+--- a/overlap_ap.py
++++ b/overlap_ap.py
+@@ -1,95 +1,95 @@
+-# 同じアクセスポイントの削除
+-import numpy as np
+-import pandas as pd 
+-
+-
+-# 授業資料内のWCLを実装
+-class Overlapap:
+-    def __init__(self, ap, rssi):
+-        self.ap = ap
+-        self.rssi = rssi
+-
+-    def get_weight_and_coords(self, floor, p, l):
+-        """
+-        授業資料内のWCLに従い、重みと座標を返すメソッド
+-        ※未完成（計算が合わない）
+-
+-        args:
+-            floor: 階数
+-            p: Location index P
+-            l: アンカーノードの個数 L
+-
+-        return:
+-            weight: 重み
+-            coorinate: 座標 (x, y)
+-        """
+-
+-        # 指定階数で計測したデータを抽出
+-        self.rssi = self.rssi[str(floor)]
+-
+-        """
+-        以下、授業資料より抜粋
+-        3階では3階に設置されたAPからのRSSIのみを、4階では4階に設置されたRSSIのみを位置推定に用いる。
+-        """
+-        # 1. 指定階数のAPを抽出
+-        check_str = str(floor) + "F"
+-        rssi_floor_only = self.rssi[self.rssi["AP_name"].str.contains(check_str)]
+-        print(f"{floor}階のAP\n{rssi_floor_only}\n")  # デバッグ用
+-
+-        # 2. 位置PのRSSIデータを抽出
+-        rssi_p = rssi_floor_only[rssi_floor_only["Location index P"] == p]
+-        print(f"位置PのRSSIデータ\n{rssi_p}\n")  # デバッグ用
+-
+-        """
+-        以下、授業資料より抜粋
+-        RSSIの中央値が大きい順に上位三つのAPを選択する。
+-        """
+-        # 3. 中央値の上位三つ(L個)を抽出
+-        # 降順でソート
+-        rssi_sorted = rssi_p.sort_values(by="MED (dBm)", ascending=False)
+-
+-        # 上位三つ(L個)のRSSI値を取得（AP_nameが重複しないようにする）
+-        rssi_med = []
+-        seen_ap_names = set()  # 重複チェック用のセット
+-
+-        for _, row in rssi_sorted.iterrows():
+-            ap_name = row["AP_name"]
+-            if ap_name not in seen_ap_names:  # AP_nameがまだ選ばれていない場合
+-                rssi_med.append(row)  # 重複していない場合のみ追加
+-                seen_ap_names.add(ap_name)  # AP_nameを記録
+-            if len(rssi_med) == l:  # 上位L個を選び終えたら終了
+-                break
+-
+-        # DataFrameに変換
+-        rssi_med = pd.DataFrame(rssi_med)
+-        print(f"上位{l}個のRSSI値（重複なし）\n{rssi_med}\n")  # デバッグ用
+-
+-        """
+-        以下、授業資料より抜粋
+-        重みは、上位三つの中でRSSIの中央値が最小のもの、つまり大きさ3番目の値との差[dB]を求め、その真値とする。
+-        """
+-        # 4. 重みを計算(相対的な重み)
+-        weight = []
+-        min_rssi = float(rssi_med["MED (dBm)"].min())  # 最小の中央値を取得
+-        for rssi in rssi_med["MED (dBm)"]:
+-            rssi = float(rssi) 
+-            if rssi == min_rssi:
+-                weight.append(1.0)  # 最小の中央値の重みを1に設定
+-            else:
+-                weight.append(float(10 ** ((rssi - min_rssi) / 10)))   # 最小中央値との差を基に計算
+-        print(f"重み\n{weight}\n")  # デバッグ用
+-
+-
+-
+-        # 5. 座標を取得
+-        coordinate = []
+-        for rssi_name in rssi_med["AP_name"]:
+-            coordinate.append(
+-                (
+-                    float(self.ap[self.ap["AP_name"] == rssi_name]["x"].iloc[0]),
+-                    float(self.ap[self.ap["AP_name"] == rssi_name]["y"].iloc[0]),
+-                )
+-            )
+-        print(f"座標\n{coordinate}\n")  # デバッグ用
+-
+-        return weight, coordinate
++# 同じアクセスポイントの削除
++import numpy as np
++import pandas as pd 
++
++
++# 授業資料内のWCLを実装
++class Overlapap:
++    def __init__(self, ap, rssi):
++        self.ap = ap
++        self.rssi = rssi
++
++    def get_weight_and_coords(self, floor, p, l):
++        """
++        授業資料内のWCLに従い、重みと座標を返すメソッド
++        ※未完成（計算が合わない）
++
++        args:
++            floor: 階数
++            p: Location index P
++            l: アンカーノードの個数 L
++
++        return:
++            weight: 重み
++            coorinate: 座標 (x, y)
++        """
++
++        # 指定階数で計測したデータを抽出
++        self.rssi = self.rssi[str(floor)]
++
++        """
++        以下、授業資料より抜粋
++        3階では3階に設置されたAPからのRSSIのみを、4階では4階に設置されたRSSIのみを位置推定に用いる。
++        """
++        # 1. 指定階数のAPを抽出
++        check_str = str(floor) + "F"
++        rssi_floor_only = self.rssi[self.rssi["AP_name"].str.contains(check_str)]
++        print(f"{floor}階のAP\n{rssi_floor_only}\n")  # デバッグ用
++
++        # 2. 位置PのRSSIデータを抽出
++        rssi_p = rssi_floor_only[rssi_floor_only["Location index P"] == p]
++        print(f"位置PのRSSIデータ\n{rssi_p}\n")  # デバッグ用
++
++        """
++        以下、授業資料より抜粋
++        RSSIの中央値が大きい順に上位三つのAPを選択する。
++        """
++        # 3. 中央値の上位三つ(L個)を抽出
++        # 降順でソート
++        rssi_sorted = rssi_p.sort_values(by="MED (dBm)", ascending=False)
++
++        # 上位三つ(L個)のRSSI値を取得（AP_nameが重複しないようにする）
++        rssi_med = []
++        seen_ap_names = set()  # 重複チェック用のセット
++
++        for _, row in rssi_sorted.iterrows():
++            ap_name = row["AP_name"]
++            if ap_name not in seen_ap_names:  # AP_nameがまだ選ばれていない場合
++                rssi_med.append(row)  # 重複していない場合のみ追加
++                seen_ap_names.add(ap_name)  # AP_nameを記録
++            if len(rssi_med) == l:  # 上位L個を選び終えたら終了
++                break
++
++        # DataFrameに変換
++        rssi_med = pd.DataFrame(rssi_med)
++        print(f"上位{l}個のRSSI値（重複なし）\n{rssi_med}\n")  # デバッグ用
++
++        """
++        以下、授業資料より抜粋
++        重みは、上位三つの中でRSSIの中央値が最小のもの、つまり大きさ3番目の値との差[dB]を求め、その真値とする。
++        """
++        # 4. 重みを計算(相対的な重み)
++        weight = []
++        min_rssi = float(rssi_med["MED (dBm)"].min())  # 最小の中央値を取得
++        for rssi in rssi_med["MED (dBm)"]:
++            rssi = float(rssi) 
++            if rssi == min_rssi:
++                weight.append(1.0)  # 最小の中央値の重みを1に設定
++            else:
++                weight.append(float(10 ** ((rssi - min_rssi) / 10)))   # 最小中央値との差を基に計算
++        print(f"重み\n{weight}\n")  # デバッグ用
++
++
++
++        # 5. 座標を取得
++        coordinate = []
++        for rssi_name in rssi_med["AP_name"]:
++            coordinate.append(
++                (
++                    float(self.ap[self.ap["AP_name"] == rssi_name]["x"].iloc[0]),
++                    float(self.ap[self.ap["AP_name"] == rssi_name]["y"].iloc[0]),
++                )
++            )
++        print(f"座標\n{coordinate}\n")  # デバッグ用
++
++        return weight, coordinate
+diff --git a/sample_wcl.py b/sample_wcl.py
+index 70f8c6c..bd645c0 100644
+--- a/sample_wcl.py
++++ b/sample_wcl.py
+@@ -23,7 +23,7 @@ class SampleWCL:
+         """
+ 
+         # 指定階数で計測したデータを抽出
+-        self.rssi = self.rssi[str(floor)]
++        rssi_floor_data = self.rssi[str(floor)]
+ 
+         """
+         以下、授業資料より抜粋
+@@ -31,10 +31,10 @@ class SampleWCL:
+         """
+         # 1. 指定階数のAPを抽出
+         check_str = str(floor) + "F"
+-        rssi_floor_only = self.rssi[self.rssi["AP_name"].str.contains(check_str)]
++        rssi_floor_only = rssi_floor_data[rssi_floor_data["AP_name"].str.contains(check_str)]
+         print(f"{floor}階のAP\n{rssi_floor_only}\n")  # デバッグ用
+ 
+-        # 2. 位置PのRSSIデータを抽出
++        # 2. 位置PのRSSIデータを抽出（mainでまとめてできるように変更）
+         rssi_p = rssi_floor_only[rssi_floor_only["Location index P"] == p]
+         print(f"位置PのRSSIデータ\n{rssi_p}\n")  # デバッグ用
+ 
+-- 
+2.34.1
+
