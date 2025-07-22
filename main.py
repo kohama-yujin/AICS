@@ -43,14 +43,14 @@ def main():
     method_results = []
     floor_results = []
     # 手法リスト
-    methods = ["SampleWCL", "5GHz", "2.4GHz"]
+    methods = ["SampleWCL", "5GHz", "24GHz"]
     # 階数リスト
     floors = [3, 4]
 
     for method in methods:
-        method_results = []
+        method_results = []  # 初期化
         for floor in floors:
-            floor_results = []
+            floor_results = []  # 初期化
             for p in range(1, 60):
                 try:
                     weight, coordinate = sampleWcl.get_weight_and_coords(floor, p, 3)
@@ -83,20 +83,35 @@ def main():
         # 手法ごとの推定結果をすべての結果リストに追加
         all_results.append({"name": method, "results": method_results})
         print(f"\033[32m{method}の推定が終わりました\033[0m")
-    print(all_results)
+
     for method in all_results:
         # CSVファイルに結果を出力
-        csv_filename = f"results/{method[]}.csv"
-        # with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
-        #     writer = csv.writer(csvfile)
-        #     # ヘッダーを書きa込み
-        #     writer.writerow([f"{floor}F-{method}", "X_Coordinate", "Y_Coordinate"])
-        #     # データを書き込み
-        #     for result in method_results:
-        #         position = result["position"]
-        #         x_coord = result["estimated_coordinate"][0]
-        #         y_coord = result["estimated_coordinate"][1]
-        #         writer.writerow([position, x_coord, y_coord])
+        csv_filename = f'results/{method["name"]}.csv'
+        # ファイルオープン
+        with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
+            writer = csv.writer(csvfile)
+            # ヘッダーを作成
+            header = []
+            for floor in method["results"]:
+                header.extend(
+                    [
+                        f"{floor['floor']}F-{method['name']}",
+                        "X_Coordinate",
+                        "Y_Coordinate",
+                    ]
+                )
+            # ヘッダーを書き込み
+            writer.writerow(header)
+            # データを作成
+            data = []
+            for floor in method["results"]:
+                for results in floor["results"]:
+                    position = results["position"]
+                    x_coord = results["estimated_coordinate"][0]
+                    y_coord = results["estimated_coordinate"][1]
+                    data.extend([position, x_coord, y_coord])
+            # データを書き込み
+            writer.writerow(data)
         print(f"\033[32m結果をCSVファイル '{csv_filename}' に保存しました\033[0m")
 
 
