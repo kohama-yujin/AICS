@@ -26,12 +26,12 @@ def main():
     # print(location.data["3"]["x"])
 
     # === 5GHzフィルタを適用 ===
-    # freq_filter = FrequencyFilter(rssi.data)
-    # filtered_rssi_data = freq_filter.filter_5ghz() 
+    freq_filter = FrequencyFilter(rssi.data)
+    filtered_rssi_data = freq_filter.filter_5ghz() 
 
     # # === 2.4GHzフィルタを適用 ===
-    freq_filter = FrequencyFilter(rssi.data)
-    filtered_rssi_data = freq_filter.filter_24ghz() 
+    # freq_filter = FrequencyFilter(rssi.data)
+    # filtered_rssi_data = freq_filter.filter_24ghz() 
 
 
 
@@ -42,10 +42,10 @@ def main():
 
 
     # デバッグ: RSSIデータの構造を確認
-    print("RSSI data keys:", rssi.data.keys() if hasattr(rssi.data, 'keys') else type(rssi.data))
-    if hasattr(rssi.data, 'keys'):
-        print("RSSI data['3'] columns:", rssi.data['3'].columns.tolist())
-        print("RSSI data['3'] 位置Pの値:", rssi.data['3']['Location index P'].unique())
+    # print("RSSI data keys:", rssi.data.keys() if hasattr(rssi.data, 'keys') else type(rssi.data))
+    # if hasattr(rssi.data, 'keys'):
+    #     print("RSSI data['3'] columns:", rssi.data['3'].columns.tolist())
+    #     print("RSSI data['3'] 位置Pの値:", rssi.data['3']['Location index P'].unique())
 
     
     # 結果を格納するリスト
@@ -54,6 +54,12 @@ def main():
     for p in range(1, 60):  # 位置P=1から59まで
         try:
             weight, coordinate = sampleWcl.get_weight_and_coords(4, p, 3)
+            print(f"位置P={p}の重み: {weight}, 座標: {coordinate}")
+
+            # 重みや座標が空でないかチェック
+            if not weight or not coordinate:
+                print(f"位置P={p}: アクセスポイントが見つかりませんでした（5GHzフィルタ後）")
+                continue
             
             # 推定位置座標 T を計算
             wcl = WCL(weight, coordinate)
@@ -73,25 +79,26 @@ def main():
     print(f"\nSampleWCL処理完了: {len(sample_results)}個の位置で推定が成功しました")
     
     # 推定座標をまとめて出力
-    print("\n=== 推定位置座標一覧 ===")
-    for result in sample_results:
-        print(f"位置P={result['position']}: {result['estimated_coordinate']}")
+    # print("\n=== 推定位置座標一覧 ===")
+    # for result in sample_results:
+    #     print(f"位置P={result['position']}: {result['estimated_coordinate']}")
     
-    # CSVファイルに結果を出力
-    csv_filename = "estimation_results_2.4GHzfilter.csv"
+    # CSVファイルに結果を出力（検出できなかった位置は除外）
+    csv_filename = "estimation_results_5GHzfilter.csv"
     with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         # ヘッダーを書き込み
         writer.writerow(['Position', 'X_Coordinate', 'Y_Coordinate'])
         
-        # データを書き込み
+        # データを書き込み（検出できた位置のみ）
         for result in sample_results:
-            position = result['position']
+            position = result['position']  # これは実際の位置P番号
             x_coord = result['estimated_coordinate'][0]
             y_coord = result['estimated_coordinate'][1]
             writer.writerow([position, x_coord, y_coord])
-    
+
     print(f"\n結果をCSVファイル '{csv_filename}' に保存しました")
+    print(f"検出できた位置: {len(sample_results)}個")
      
     '''
     # アクセスポイントの被りなし（位置P=1から59まで）
