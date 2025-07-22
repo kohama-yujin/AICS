@@ -3,6 +3,7 @@ from sample_wcl import SampleWCL
 from wcl import WCL
 from overlap_ap import Overlapap
 import csv
+from frequency_filter import FrequencyFilter
 
 
 def main():
@@ -24,10 +25,22 @@ def main():
     # print(location.data["3"].columns)  # .columnsでカラム名を確認できる
     # print(location.data["3"]["x"])
 
+    # === 5GHzフィルタを適用 ===
+    # freq_filter = FrequencyFilter(rssi.data)
+    # filtered_rssi_data = freq_filter.filter_5ghz() 
+
+    # # === 2.4GHzフィルタを適用 ===
+    freq_filter = FrequencyFilter(rssi.data)
+    filtered_rssi_data = freq_filter.filter_24ghz() 
+
+
+
     
     # 授業資料中のWCLを実装（位置P=1から59まで）
-    sampleWcl = SampleWCL(ap.data, rssi.data)
-    
+    # sampleWcl = SampleWCL(ap.data, rssi.data)
+    sampleWcl = SampleWCL(ap.data, filtered_rssi_data) # 5GHzフィルタを適用したRSSIデータを使用
+
+
     # デバッグ: RSSIデータの構造を確認
     print("RSSI data keys:", rssi.data.keys() if hasattr(rssi.data, 'keys') else type(rssi.data))
     if hasattr(rssi.data, 'keys'):
@@ -40,7 +53,7 @@ def main():
     
     for p in range(1, 60):  # 位置P=1から59まで
         try:
-            weight, coordinate = sampleWcl.get_weight_and_coords(4, p, 5)
+            weight, coordinate = sampleWcl.get_weight_and_coords(4, p, 3)
             
             # 推定位置座標 T を計算
             wcl = WCL(weight, coordinate)
@@ -65,7 +78,7 @@ def main():
         print(f"位置P={result['position']}: {result['estimated_coordinate']}")
     
     # CSVファイルに結果を出力
-    csv_filename = "estimation_results.csv"
+    csv_filename = "estimation_results_2.4GHzfilter.csv"
     with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
         # ヘッダーを書き込み
