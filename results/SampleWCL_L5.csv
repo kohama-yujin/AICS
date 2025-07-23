@@ -1,5 +1,6 @@
-3F-SampleWCL_L5,estimated,,correct,,,4F-SampleWCL_L5,estimated,,correct,,
-,x,y,x,y,error,,x,y,x,y,error
+3F-SampleWCL_L5,,,,,,4F-SampleWCL_L5,,,,,
+,estimated,,correct,,,,estimated,,correct,,
+Index P,x,y,x,y,error,Index P,x,y,x,y,error
 1,30.035,0.062,32,0,1.966,1,29.964,-0.028,32,0,2.036
 2,29.095,0.0,30,0,0.905,2,29.383,0.0,30,0,0.617
 3,25.326,0.0,28,0,2.674,3,29.932,0.0,28,0,1.932

@@ -1,9 +1,10 @@
 from aics_excel_loader import AicsExcelLoader
 from sample_wcl import SampleWCL
 from wcl import WCL
+from frequency_filter import FrequencyFilter
 from overlap_ap import Overlapap
 from count import Count
-from frequency_filter import FrequencyFilter
+from overlap_ap_count import OverlapapCount
 import traceback
 import csv
 import math
@@ -45,6 +46,20 @@ def main():
     overlap = Overlapap(ap.data, rssi.data)
     # カウント数を優先
     count = Count(ap.data, rssi.data)
+    # 2.4GHzフィルタ & 重複削除
+    filtered_24ghz_overlap = Overlapap(ap.data, filtered_24ghz_rssi_data)
+    # 2.4GHzフィルタ & カウント
+    filtered_24ghz_count = Count(ap.data, filtered_24ghz_rssi_data)
+    # 5GHzフィルタ & 重複削除
+    filtered_5ghz_overlap = Overlapap(ap.data, filtered_5ghz_rssi_data)
+    # 5GHzフィルタ & カウント
+    filtered_5ghz_count = Count(ap.data, filtered_5ghz_rssi_data)
+    # 重複削除 & カウント
+    overlap_count = OverlapapCount(ap.data, rssi.data)
+    # 2.4GHzフィルタ & 重複削除 & カウント
+    filtered_24ghz_overlap_count = OverlapapCount(ap.data, filtered_24ghz_rssi_data)
+    # 5GHzフィルタ & 重複削除 & カウント
+    filtered_5ghz_overlap_count = OverlapapCount(ap.data, filtered_5ghz_rssi_data)
 
     # 結果を格納するリスト
     all_results = []
@@ -55,7 +70,6 @@ def main():
     method_correct = []
     floor_correct = []
     # 手法リスト
-    # methods = ["SampleWCL"]
     methods = [
         "SampleWCL_L3",
         "SampleWCL_L4",
@@ -64,6 +78,13 @@ def main():
         "24GHz",
         "Overlap",
         "Count",
+        "24GHz-Overlap",
+        "24GHz-Count",
+        "5GHz-Overlap",
+        "5GHz-Count",
+        "Overlap-Count",
+        "24GHz-Overlap-Count",
+        "5GHz-Overlap-Count",
     ]
     # 階数リスト
     floors = [3, 4]
@@ -100,6 +121,38 @@ def main():
                         weight, coordinate = overlap.get_weight_and_coords(floor, p, 3)
                     elif method == "Count":
                         weight, coordinate = count.get_weight_and_coords(floor, p, 3)
+                    elif method == "24GHz-Overlap":
+                        weight, coordinate = (
+                            filtered_24ghz_overlap.get_weight_and_coords(floor, p, 3)
+                        )
+                    elif method == "24GHz-Count":
+                        weight, coordinate = filtered_24ghz_count.get_weight_and_coords(
+                            floor, p, 3
+                        )
+                    elif method == "5GHz-Overlap":
+                        weight, coordinate = (
+                            filtered_5ghz_overlap.get_weight_and_coords(floor, p, 3)
+                        )
+                    elif method == "5GHz-Count":
+                        weight, coordinate = filtered_5ghz_count.get_weight_and_coords(
+                            floor, p, 3
+                        )
+                    elif method == "Overlap-Count":
+                        weight, coordinate = overlap_count.get_weight_and_coords(
+                            floor, p, 3
+                        )
+                    elif method == "24GHz-Overlap-Count":
+                        weight, coordinate = (
+                            filtered_24ghz_overlap_count.get_weight_and_coords(
+                                floor, p, 3
+                            )
+                        )
+                    elif method == "5GHz-Overlap-Count":
+                        weight, coordinate = (
+                            filtered_5ghz_overlap_count.get_weight_and_coords(
+                                floor, p, 3
+                            )
+                        )
 
                     # 推定位置座標 T を計算
                     wcl = WCL(weight, coordinate)
@@ -154,9 +207,9 @@ def main():
                 title.extend(
                     [
                         f"{floor['floor']}F-{method['name']}",
-                        "estimated",
                         "",
-                        "correct",
+                        "",
+                        "",
                         "",
                         "",
                     ]
@@ -169,6 +222,21 @@ def main():
                 header.extend(
                     [
                         "",
+                        "estimated",
+                        "",
+                        "correct",
+                        "",
+                        "",
+                    ]
+                )
+            # ヘッダーを書き込み
+            writer.writerow(header)
+            # サブヘッダーを作成
+            subheader = []
+            for floor in method["results"]:
+                subheader.extend(
+                    [
+                        "Index P",
                         "x",
                         "y",
                         "x",
@@ -176,8 +244,8 @@ def main():
                         "error",
                     ]
                 )
-            # ヘッダーを書き込み
-            writer.writerow(header)
+            # サブヘッダーを書き込み
+            writer.writerow(subheader)
 
             # データを作成
             total_error = []

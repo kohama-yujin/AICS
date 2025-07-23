@@ -1,8 +1,10 @@
+# 同じアクセスポイントの削除
 import numpy as np
+import pandas as pd
 
 
 # 授業資料内のWCLを実装
-class SampleWCL:
+class OverlapapCount:
     def __init__(self, ap, rssi):
         self.ap = ap
         self.rssi = rssi
@@ -10,6 +12,7 @@ class SampleWCL:
     def get_weight_and_coords(self, floor, p, l):
         """
         授業資料内のWCLに従い、重みと座標を返すメソッド
+        ※未完成（計算が合わない）
 
         args:
             floor: 階数
@@ -35,7 +38,7 @@ class SampleWCL:
         ]
         # print(f"{floor}階のAP\n{rssi_floor_only}\n")  # デバッグ用
 
-        # 2. 位置PのRSSIデータを抽出（mainでまとめてできるように変更）
+        # 2. 位置PのRSSIデータを抽出
         rssi_p = rssi_floor_only[rssi_floor_only["Location index P"] == p]
         # print(f"位置PのRSSIデータ\n{rssi_p}\n")  # デバッグ用
 
@@ -43,12 +46,25 @@ class SampleWCL:
         以下、授業資料より抜粋
         RSSIの中央値が大きい順に上位三つのAPを選択する。
         """
-        # 3. 中央値の上位三つ(L個)を抽出
-        # 降順でソート
-        rssi_sorted = rssi_p.sort_values(by="MED (dBm)", ascending=False)
-        # 上位三つ(L個)のRSSI値を取得
-        rssi_med = rssi_sorted[0:l]
-        # print(f"{p}:上位{l}個のRSSI値\n{rssi_med}\n")  # デバッグ用
+        # 3. 'Counts (/100)' の値が多く、かつ 'MED (dBm)' の値が高い順にソート
+        rssi_sorted = rssi_p.sort_values(
+            by=["Counts (/100)", "MED (dBm)"], ascending=[False, False]
+        )
+        # 上位三つ(L個)のRSSI値を取得（AP_nameが重複しないようにする）
+        rssi_med = []
+        seen_ap_names = set()  # 重複チェック用のセット
+
+        for _, row in rssi_sorted.iterrows():
+            ap_name = row["AP_name"]
+            if ap_name not in seen_ap_names:  # AP_nameがまだ選ばれていない場合
+                rssi_med.append(row)  # 重複していない場合のみ追加
+                seen_ap_names.add(ap_name)  # AP_nameを記録
+            if len(rssi_med) == l:  # 上位L個を選び終えたら終了
+                break
+
+        # DataFrameに変換
+        rssi_med = pd.DataFrame(rssi_med)
+        # print(f"上位{l}個のRSSI値（重複なし）\n{rssi_med}\n")  # デバッグ用
 
         """
         以下、授業資料より抜粋

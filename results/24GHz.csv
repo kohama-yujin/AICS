@@ -1,5 +1,6 @@
-3F-24GHz,estimated,,correct,,,4F-24GHz,estimated,,correct,,
-,x,y,x,y,error,,x,y,x,y,error
+3F-24GHz,,,,,,4F-24GHz,,,,,
+,estimated,,correct,,,,estimated,,correct,,
+Index P,x,y,x,y,error,Index P,x,y,x,y,error
 1,30.053,0.062,32,0,1.948,1,29.997,-0.028,32,0,2.003
 2,28.839,0.0,30,0,1.161,2,29.249,0.0,30,0,0.751
 3,24.743,0.0,28,0,3.257,3,30.021,0.0,28,0,2.021
