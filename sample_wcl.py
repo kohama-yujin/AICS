@@ -10,7 +10,6 @@ class SampleWCL:
     def get_weight_and_coords(self, floor, p, l):
         """
         授業資料内のWCLに従い、重みと座標を返すメソッド
-        ※未完成（計算が合わない）
 
         args:
             floor: 階数

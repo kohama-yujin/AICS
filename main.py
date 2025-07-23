@@ -17,7 +17,7 @@ def main():
     # インスタンス化
     ap = AicsExcelLoader(data_folda + "/AP_coordinate.xlsx")
     location = AicsExcelLoader(data_folda + "/location_coordinate.xlsx")
-    rssi = AicsExcelLoader(data_folda + "/measured_RSSI.xlsx")
+    rssi = AicsExcelLoader(data_folda + "/measured_RSSI_Bdelete.xlsx")
 
     # データの確認
     # print(ap.data)  # シートが1枚の時：データフレーム型
@@ -41,6 +41,10 @@ def main():
     filtered_5ghz_sampleWcl = SampleWCL(ap.data, filtered_5ghz_rssi_data)
     # 2.4GHzフィルタを適用して授業資料中のWCLを実装
     filtered_24ghz_sampleWcl = SampleWCL(ap.data, filtered_24ghz_rssi_data)
+    # 重複削除
+    overlap = Overlapap(ap.data, rssi.data)
+    # カウント数を優先
+    count = Count(ap.data, rssi.data)
 
     # 結果を格納するリスト
     all_results = []
@@ -51,7 +55,16 @@ def main():
     method_correct = []
     floor_correct = []
     # 手法リスト
-    methods = ["SampleWCL", "5GHz", "24GHz"]
+    # methods = ["SampleWCL"]
+    methods = [
+        "SampleWCL_L3",
+        "SampleWCL_L4",
+        "SampleWCL_L5",
+        "5GHz",
+        "24GHz",
+        "Overlap",
+        "Count",
+    ]
     # 階数リスト
     floors = [3, 4]
 
@@ -63,9 +76,17 @@ def main():
             floor_correct = []
             for p in range(1, 60):
                 try:
-                    if method == "SampleWCL":
+                    if method == "SampleWCL_L3":
                         weight, coordinate = sampleWcl.get_weight_and_coords(
                             floor, p, 3
+                        )
+                    elif method == "SampleWCL_L4":
+                        weight, coordinate = sampleWcl.get_weight_and_coords(
+                            floor, p, 4
+                        )
+                    elif method == "SampleWCL_L5":
+                        weight, coordinate = sampleWcl.get_weight_and_coords(
+                            floor, p, 5
                         )
                     elif method == "5GHz":
                         weight, coordinate = (
@@ -75,10 +96,14 @@ def main():
                         weight, coordinate = (
                             filtered_24ghz_sampleWcl.get_weight_and_coords(floor, p, 3)
                         )
+                    elif method == "Overlap":
+                        weight, coordinate = overlap.get_weight_and_coords(floor, p, 3)
+                    elif method == "Count":
+                        weight, coordinate = count.get_weight_and_coords(floor, p, 3)
+
                     # 推定位置座標 T を計算
                     wcl = WCL(weight, coordinate)
                     T = wcl.calculate_coordinate()
-                    print(T)
                     rounded_T = tuple(round(x, 3) for x in T)
                     # 推定結果を階数結果リストに追加
                     floor_results.append(
@@ -97,7 +122,7 @@ def main():
                 # 例外処理を追加
                 except Exception as e:
                     print(
-                        f"\033[33mSampleWCL 位置P={p}: エラーが発生しました - {e}\033[0m"
+                        f"\033[31mSampleWCL 位置P={p}: エラーが発生しました - {e}\033[0m"
                     )
                     traceback.print_exc()
                     continue
@@ -110,7 +135,7 @@ def main():
             )
             method_correct.append(floor_correct)
             print(
-                f"{floor}階での処理完了: {len(floor_results)}個の位置で推定が成功しました"
+                f"\033[36m{floor}階での処理完了: {len(floor_results)}個の位置で推定が成功しました\033[0m"
             )
         # 手法ごとの推定結果をすべての結果リストに追加
         all_results.append({"name": method, "results": method_results})
