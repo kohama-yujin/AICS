@@ -47,7 +47,7 @@ class SampleWCL:
         rssi_sorted = rssi_p.sort_values(by="MED (dBm)", ascending=False)
         # 上位三つ(L個)のRSSI値を取得
         rssi_med = rssi_sorted[0:l]
-        # print(f"上位{l}個のRSSI値\n{rssi_med}\n")  # デバッグ用
+        print(f"上位{l}個のRSSI値\n{rssi_med}\n")  # デバッグ用
 
         """
         以下、授業資料より抜粋
